@@ -63,7 +63,7 @@ services:
         condition: service_started
         
   keyclocak-server:
-    image: jboss/keycloak:latest
+    image: jboss/keycloak:16.1.1
     container_name: keycloak-server-app 
     volumes:
       - ./imports_reamls:/opt/jboss/keycloak/imports
