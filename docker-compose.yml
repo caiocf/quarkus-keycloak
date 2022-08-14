@@ -52,9 +52,9 @@ services:
       - $HOME/.m2:/root/.m2  
     environment:
       QUARKUS_PROFILE: localDocker
-      KEYCLOAK_URL: http://gateway.docker.internal/auth/realms/meetup
+      KEYCLOAK_URL: http://gateway.docker.internal/realms/meetup
       KEYCLOAK_CLIENT_ID: backend-app
-      KEYCLOAK_CLIENT_SECRET: 54EfklsTN0nYAl1rp6XQxyYQSHBzPGWw
+      KEYCLOAK_CLIENT_SECRET: lVFlfBUJu3Ii5ndBmLH5u2aKJEfhnqKj
       LIST_ORIGINS_HOSTS_CORS: 'http://gateway.docker.internal,http://localhost'
     extra_hosts:
       - "host.docker.internal:host-gateway" 
@@ -63,7 +63,7 @@ services:
         condition: service_started
         
   keyclocak-server:
-    image: jboss/keycloak:16.1.1
+    image: quay.io/keycloak/keycloak:19.0
     container_name: keycloak-server-app 
     volumes:
       - ./imports_reamls:/opt/jboss/keycloak/imports
@@ -80,11 +80,12 @@ services:
       KC_HTTP_ENABLED: 'true'
       PROXY_ADDRESS_FORWARDING: 'true'
       KC_HOSTNAME_STRICT_BACKCHANNEL: 'false'
-      DB_VENDOR: mysql
-      DB_USER: keycloak
-      DB_PASSWORD: password
-      DB_ADDR: mysql-server
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+      KC_DB: mysql
+      KC_DB_URL: 'jdbc:mysql://mysql-server/keycloak'
       # KEYCLOAK_IMPORT: /tmp/import/global.json
+    entrypoint: /opt/keycloak/bin/kc.sh start --auto-build
     ports:
       - 8180:8080   
     expose:
@@ -92,7 +93,7 @@ services:
     networks:
       - minha-rede
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/auth/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       timeout: 20s
       interval: 2s
       retries: 10      
