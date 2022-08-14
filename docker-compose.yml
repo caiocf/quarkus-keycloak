@@ -1,0 +1,112 @@
+version: '3'
+services:
+  frontend-spa:
+    image: nginx:latest
+    container_name: frontend-app
+    ports:
+      - 5500:80
+      - 80:80
+    volumes: 
+      - ./nginx/frontend:/usr/share/nginx/html
+      - ./nginx/conf.d:/etc/nginx/conf.d 
+    networks:
+      - minha-rede
+    extra_hosts:
+      - "host.docker.internal:host-gateway" 
+    depends_on:
+      keyclocak-server:  
+        condition: service_started
+        
+  mysql-server:
+    image: mysql:8.0.22
+    container_name: mysql-server-db
+    environment:
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - '3306:3306' 
+    expose:
+      - 3306
+    volumes:
+      - volume-mysql-keycloak:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ,"-u", "$$MYSQL_USER","--password=$$MYSQL_PASSWORD"]
+      timeout: 20s
+      interval: 2s
+      retries: 10    
+    networks:
+      - minha-rede
+      
+  quarkus-rest:
+    container_name: quarkus-rest-app
+    build:
+      context: quarkus-rest-app
+      dockerfile: Dockerfile.jvm
+    networks:
+      - minha-rede 
+    ports:
+      - '8080:8080' 
+    volumes:
+      - $HOME/.m2:/root/.m2  
+    environment:
+      QUARKUS_PROFILE: localDocker
+      KEYCLOAK_URL: http://gateway.docker.internal/auth/realms/meetup
+      KEYCLOAK_CLIENT_ID: backend-app
+      KEYCLOAK_CLIENT_SECRET: 54EfklsTN0nYAl1rp6XQxyYQSHBzPGWw
+      LIST_ORIGINS_HOSTS_CORS: 'http://gateway.docker.internal,http://localhost'
+    extra_hosts:
+      - "host.docker.internal:host-gateway" 
+    depends_on:
+      keyclocak-server:  
+        condition: service_started
+        
+  keyclocak-server:
+    image: jboss/keycloak:latest
+    container_name: keycloak-server-app 
+    volumes:
+      - ./imports_reamls:/opt/jboss/keycloak/imports
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+      TZ: UTC
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HOSTNAME_STRICT_HTTPS: 'false'
+      KC_METRICS_ENABLED: 'true'
+      KC_FEATURES: token-exchange
+      KC_HTTP_ENABLED: 'true'
+      PROXY_ADDRESS_FORWARDING: 'true'
+      KC_HOSTNAME_STRICT_BACKCHANNEL: 'false'
+      DB_VENDOR: mysql
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      DB_ADDR: mysql-server
+      # KEYCLOAK_IMPORT: /tmp/import/global.json
+    ports:
+      - 8180:8080   
+    expose:
+      - 8080
+    networks:
+      - minha-rede
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/auth/"]
+      timeout: 20s
+      interval: 2s
+      retries: 10      
+    depends_on:
+      mysql-server:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"        
+volumes:
+  volume-mysql-keycloak:
+    name: volume-mysql-keycloak
+    
+networks:
+  minha-rede:
+    name: rede-externa    
+    
+  
