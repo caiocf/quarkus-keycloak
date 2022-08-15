@@ -52,7 +52,7 @@ Dados Login do realm Meetup:
 
 #### Detalhamento do EndPoints
 * Url FronEnd: http://gateway.docker.internal
-* Url KeyCloak (usuário: admin e senha: password): http://gateway.docker.internal/auth/  
+* Url KeyCloak (usuário: admin e senha: password): http://gateway.docker.internal/admin  
 * API BackEnd:
   * Url Publica: http://gateway.docker.internal/api/public/
   * Apenas com a Role: user
