@@ -4,7 +4,6 @@ services:
     image: nginx:latest
     container_name: frontend-app
     ports:
-      - 5500:80
       - 80:80
     volumes: 
       - ./nginx/frontend:/usr/share/nginx/html
@@ -66,7 +65,7 @@ services:
     image: quay.io/keycloak/keycloak:19.0
     container_name: keycloak-server-app 
     volumes:
-      - ./imports_reamls:/opt/jboss/keycloak/imports
+      - ./imports_reamls:/opt/keycloak/data/import
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: password
@@ -85,7 +84,7 @@ services:
       KC_DB: mysql
       KC_DB_URL: 'jdbc:mysql://mysql-server/keycloak'
       # KEYCLOAK_IMPORT: /tmp/import/global.json
-    entrypoint: /opt/keycloak/bin/kc.sh start --auto-build
+    entrypoint: /opt/keycloak/bin/kc.sh start --auto-build --import-realm
     ports:
       - 8180:8080   
     expose:

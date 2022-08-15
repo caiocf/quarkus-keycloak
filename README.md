@@ -38,11 +38,15 @@ Execute o comando abaixo e depois acesse a URL http://gateway.docker.internal
 
 <br/>
 
-
 Tela do FrontEnd
 ![tela do front end html](flow/tela_frontEnd_demo.PNG)
 
-Onde temos opções de login, mostra token e logout e o envio do token para API.
+Dados Login do reaml Meetup:
+Usuário: user1 e senha: user1  perfil/role: user
+Usuário: user2 e senha: user2  perfil/role: admin
+
+
+Onde temos opções de login, mostrar token e logout e o envio do token para API.
 
 <br/>
 
