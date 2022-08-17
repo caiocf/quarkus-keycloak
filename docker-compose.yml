@@ -84,6 +84,7 @@ services:
       KC_DB_PASSWORD: password
       KC_DB: mysql
       KC_DB_URL: 'jdbc:mysql://mysql-server/keycloak'
+      KC_PROXY: edge
       # KEYCLOAK_IMPORT: /tmp/import/global.json
     entrypoint: /opt/keycloak/bin/kc.sh start --auto-build --import-realm
     ports:
